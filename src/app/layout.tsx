@@ -1,5 +1,5 @@
 import "./globals.css";
-
+import { ReduxProvider } from "@/src/store/provider";
 
 export default function RootLayout({
   children,
@@ -7,9 +7,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ru">
       <body>
-        {children}
+        <ReduxProvider> {children}</ReduxProvider>
       </body>
     </html>
   );
