@@ -1,3 +1,4 @@
+"use client"
 import InputAuth from '@/src/ui/components/input'
 import Button , { ButtonType }  from '@/src/ui/components/button'
 import { useState } from 'react';

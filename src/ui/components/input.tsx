@@ -1,3 +1,4 @@
+"use client"
 import { useId, useState, type InputHTMLAttributes } from "react";
 import { Eye, EyeClosed, type LucideIcon } from "lucide-react";
 

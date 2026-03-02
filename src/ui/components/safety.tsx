@@ -1,4 +1,4 @@
-
+"use client"
 import { ShieldCheck } from 'lucide-react'
 const Safety: React.FC = () => {
     return (

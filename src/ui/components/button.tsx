@@ -1,3 +1,4 @@
+"use client"
 import type { MouseEventHandler } from 'react';
 import styles from '@/src/ui/styles/button.module.css';
 import {UserPlus, LogIn, LucideProps} from 'lucide-react'
