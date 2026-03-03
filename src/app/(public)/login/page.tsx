@@ -1,6 +1,6 @@
 import Head from '@/src/ui/components/head'
 import {HeadType} from '@/src/ui/components/head'
-import AuthForm from '@/src/ui/layout/auth/form'
+import AuthForm from '@/src/feature/auth/ui/authForm'
 import UpLink from '@/src/ui/components/up-link'
 import Safety from '@/src/ui/components/safety'
 const LoginPage = () => {

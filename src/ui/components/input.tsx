@@ -7,6 +7,7 @@ interface InputAuthProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   icon: LucideIcon;
   type?: string;
+  hasError: boolean;
 }
 
 const InputAuth: React.FC<InputAuthProps> = ({
@@ -18,11 +19,11 @@ const InputAuth: React.FC<InputAuthProps> = ({
   icon: Icon,
   value,
   name,
+  hasError = false,
   ...props
 }) => {
   const id = useId();
   const errorId = `${id}-error`;
-  const hasError = Boolean(error);
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
