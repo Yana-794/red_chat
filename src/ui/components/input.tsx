@@ -2,7 +2,7 @@
 import { useId, useState, type InputHTMLAttributes } from "react";
 import { Eye, EyeClosed, type LucideIcon } from "lucide-react";
 
-interface InputAuthProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputAuthProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'error'> {
   label: string;
   error?: string;
   icon: LucideIcon;
@@ -14,6 +14,7 @@ const InputAuth: React.FC<InputAuthProps> = ({
   label,
   error,
   onChange,
+  onBlur,
   disabled,
   type = "text",
   icon: Icon,
@@ -55,11 +56,15 @@ const InputAuth: React.FC<InputAuthProps> = ({
           value={value}
           disabled={disabled}
           onChange={onChange}
+          onBlur={onBlur}
           type={inputType}
           aria-invalid={hasError}
           aria-describedby={hasError ? errorId : undefined}
-          className={`w-full pl-12 pr-4 py-3.5 bg-[#0a0e27]/60 border border-red-900/30 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600/50 transition-all duration-200
-           ${hasError ? "border-rose-500/50 hover:border-rose-500 focus:border-rose-500 focus:ring-rose-500/10" : ""}
+          className={`w-full pl-12 pr-4 py-3.5 bg-[#0a0e27]/60 border rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-200
+            ${hasError 
+              ? "border-rose-500/50 hover:border-rose-500 focus:border-rose-500 focus:ring-rose-500/10" 
+              : "border-red-900/30 focus:ring-red-600 focus:border-red-600/50"
+            }
             ${disabled ? "opacity-50 cursor-not-allowed bg-slate-900/50 border-slate-800" : ""}
           `}
         />
@@ -67,23 +72,22 @@ const InputAuth: React.FC<InputAuthProps> = ({
           <button
             type="button"
             onClick={toggleShowPassword}
-            className="absolute inset-y-0 right-4 flex items-center text-gray-400"
+            className="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-gray-300 transition-colors"
             aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
           >
             {showPassword ? (
-              <Eye color="#ff6251" />
+              <Eye color="#ff6251" size={20} />
             ) : (
-              <EyeClosed color="#ff6251" />
+              <EyeClosed color="#ff6251" size={20} />
             )}
           </button>
         )}
       </div>
-      {error && (
+      {error && hasError && (
         <p
           id={errorId}
-          className="text-xs font-medium text-rose-500 mt-0.5"
+          className="text-xs font-medium text-rose-500 mt-1.5 ml-2"
           role="alert"
-          aria-live="polite"
         >
           {error}
         </p>

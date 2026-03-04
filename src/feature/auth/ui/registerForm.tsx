@@ -5,11 +5,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAppDispatch, useAppSelector } from "@/src/store/hooks";
-import { loginThunk } from "@/src/feature/auth/model/authThunk";
+import { registerThunk } from "@/src/feature/auth/model/registerThunk";
 
 import { Lock, User } from "lucide-react";
 
-const AuthForm: React.FC = () => {
+const RegisterForm: React.FC = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const isAuth = useAppSelector((state) => state.auth.isAuth);
@@ -19,8 +19,12 @@ const AuthForm: React.FC = () => {
 
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
-  const [touched, setTouched] = useState({name: false, password: false, });
-
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [touched, setTouched] = useState({
+    name: false,
+    password: false,
+    confirmPassword: false,
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,42 +32,70 @@ const AuthForm: React.FC = () => {
     setTouched({
       name: true,
       password: true,
+           confirmPassword: true,
+
     })
 
-    if (!name.trim() || !password.trim()) return;
-    dispatch(loginThunk({ username: name, password: password }));
+     if (!name.trim() || !password.trim() || !confirmPassword.trim()) return;
+    
+    if (password !== confirmPassword) return;
+    
+    dispatch(registerThunk({ 
+      username: name, 
+      password: password 
+    }));
   };
 
-  const handleBlure = (field: 'name' | 'password') => {
+  const handleBlure = (field: 'name' | 'password' | 'confirmPassword') => {
     setTouched(prev => ({
       ...prev,
       [field]: true
     }));
   }
    
-const getError = (field: 'name' | 'password', value: string):boolean => {
+const getError = (field: 'name' | 'password' | 'confirmPassword' , value: string):boolean => {
   if(!touched[field]) return false;
 
   if(!value.trim()) return true;
 
-  if(isError && field === 'name' && name.trim()) return true;
-  if(isError && field === 'password' && password.trim()) return true;
+  if(field === 'confirmPassword' && value.trim()){
+    if(value !== password) return true;
+  }
+
+   if (isError && field === 'name' && name.trim() && password.trim()) {
+      return true;
+    }
 
   return false
 }
 
-  const getErrorMesssage = (field: 'name' | 'password'):string |undefined => {
+  const getErrorMesssage = (field: 'name' | 'password' | 'confirmPassword'):string |undefined => {
     if(field === 'name' && touched.name && !name.trim()){
       return 'Имя пользователя обязательно'
     }
     if(field === 'password' && touched.password && !password.trim()){
       return 'Пароль обязателен'
     }
+    if(field === 'confirmPassword' && touched.confirmPassword){
+        if(!confirmPassword.trim()){
+            return 'Подтвердите пароль'
+        }
+        if(confirmPassword !== password){
+            return 'Пароли не совпадают'
+        }
+    }
     if(isError && field === 'name' && name.trim() && password.trim()){
-      return errorMessage || "Неверные учетные данные"
+      return errorMessage || "Пользователь с таким именем уже существует"
     }
      return undefined;
   }
+
+  const isFormValid = () =>{
+    return(
+        name.trim() && password.trim() && confirmPassword.trim() && password === confirmPassword
+    )
+  }
+
   useEffect(() => {
     if (isAuth && user?.username) {
       router.push(`/${user.username}/messages`);
@@ -95,13 +127,25 @@ const getError = (field: 'name' | 'password', value: string):boolean => {
         hasError={getError('password', password)}
         error={getErrorMesssage('password')}
       />
+
+        <InputAuth
+        label="Подтверждение пароля"
+        type="password"
+        placeholder="Подтвердите пароль"
+        icon={Lock}
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)} 
+        onBlur={() => handleBlure('confirmPassword')}
+        hasError={getError('confirmPassword', confirmPassword)}
+        error={getErrorMesssage('confirmPassword')}
+      />
       <Button
         buttonType={ButtonType.LOGIN} // Используем существующий тип
         onClick={handleSubmit}
-        disabled={!name.trim() || !password.trim()} // Опционально: дизейблим если поля пустые
+        disabled={!isFormValid()} // Опционально: дизейблим если поля пустые
       />
     </form>
   );
 };
 
-export default AuthForm;
+export default RegisterForm;
