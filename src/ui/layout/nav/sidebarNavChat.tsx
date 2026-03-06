@@ -1,13 +1,13 @@
 import React from "react";
 import { Users, LucideIcon } from "lucide-react";
-interface ChatsItem {
+export interface ChatsItem {
   id: number;
   name: string;
   icon: LucideIcon;
   description: string;
   online: number | null;
 }
-const CHAT_ITEM: ChatsItem[] = [
+export const CHAT_ITEM: ChatsItem[] = [
   {
     id: 1,
     name: "Генеральный чат",
