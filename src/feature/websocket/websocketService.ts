@@ -1,6 +1,7 @@
 import { Dispatch } from "@reduxjs/toolkit";
 import { addMessage, Message } from "../messages/model/messagesSlice";
 import { setConnectionStatus, setError } from "../websocket/websocketSlice";
+import { updateChatLastMessage } from "@/src/feature/chat/model/ChatSlise";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://redchat.space";
 const WS_URL = API_BASE_URL.replace(/^http/, "ws"); // https:// -> wss://, http:// -> ws://
@@ -14,6 +15,7 @@ class WebSocketService {
   private maxReconnectAttempts = 5;
   private reconnectTimeout = 3000;
   private messageHandlers: MessageHandler[] = [];
+  private activeChat: number | null = null;
 
   connect(dispatch: Dispatch) {
     // метод запоминает курьера
@@ -46,6 +48,12 @@ class WebSocketService {
 
       if (this.dispatch) {
         this.dispatch(addMessage(message));
+
+        this.dispatch(updateChatLastMessage({
+          chatId: 1,// ID текущего чата (нужно получать из состояния)
+          message: message.content,
+          time: message.createdAd,
+        }))
       }
     } catch (error) {
       console.error("Error parsing message:", error);
@@ -101,6 +109,9 @@ class WebSocketService {
 
   removeMessageHandler(handler: MessageHandler) {
     this.messageHandlers = this.messageHandlers.filter((h) => h !== handler);
+  }
+  setActiveChat(chatId: number){
+    this.activeChat = chatId;
   }
   disconnect() {
     if (this.socket) {
