@@ -1,7 +1,7 @@
 import React from "react";
 import { Users } from "lucide-react";
-import { useRouter } from "next/router";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation"; 
+
 import { useAppDispatch, useAppSelector } from "@/src/store/hooks";
 import { setActiveChat, Chat } from "@/src/feature/chat/model/ChatSlise";
 
