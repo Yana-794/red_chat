@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface Chat {
+export interface Chat {
   id: number;
   name: string;
   lastMessage?: string;
