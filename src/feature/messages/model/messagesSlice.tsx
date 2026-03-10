@@ -30,31 +30,44 @@ const messagesSlice = createSlice({
       state.messages = action.payload;
       state.hasMore = action.payload.length === 50;
     },
-    addMessage(state, action: PayloadAction<Message>){
-        state.messages.push(action.payload)
+    addMessage(state, action: PayloadAction<Message>) {
+      state.messages.push(action.payload);
     },
-    addMessages(state, action: PayloadAction<Message[]>){
-        state.messages = [...action.payload, ...state.messages]
+    addMessages(state, action: PayloadAction<Message[]>) {
+      state.messages = [...action.payload, ...state.messages];
     },
-    setError(state, action: PayloadAction<string | null>){
-        state.error = action.payload
+    deleteMessage(state, action: PayloadAction<number>) {
+      state.messages = state.messages.filter(
+        (msg) => msg.id !== action.payload,
+      );
     },
-    setLoading(state, action: PayloadAction<boolean>){
-state.isLoading = action.payload
-    }, 
+    updateMessage(state, action: PayloadAction<Message>){
+      const index = state.messages.findIndex(msg => msg.id === action.payload.id);
+      if(index != -1){
+        state.messages[index] = action.payload
+      }
+    },
+    setError(state, action: PayloadAction<string | null>) {
+      state.error = action.payload;
+    },
+    setLoading(state, action: PayloadAction<boolean>) {
+      state.isLoading = action.payload;
+    },
     clearMessages(state) {
-        state.messages = [];
-        state.hasMore = true;
-
-    }
+      state.messages = [];
+      state.hasMore = true;
+    },
   },
 });
 
 export const {
-    setMessages,
-    addMessage, 
-    addMessages,
-    setError,
-    setLoading,
-    clearMessages,} = messagesSlice.actions;
-export default messagesSlice.reducer
+  setMessages,
+  addMessage,
+  addMessages,
+  deleteMessage,
+  updateMessage,
+  setError,
+  setLoading,
+  clearMessages,
+} = messagesSlice.actions;
+export default messagesSlice.reducer;

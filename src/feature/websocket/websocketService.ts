@@ -3,8 +3,7 @@ import { addMessage, Message } from "../messages/model/messagesSlice";
 import { setConnectionStatus, setError } from "../websocket/websocketSlice";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://redchat.space";
-// Исправляем замену, чтобы она работала надежно
-const WS_URL = API_BASE_URL.replace(/^http/, 'ws'); // https:// -> wss://, http:// -> ws://
+const WS_URL = API_BASE_URL.replace(/^http/, "ws"); // https:// -> wss://, http:// -> ws://
 
 type MessageHandler = (message: Message) => void;
 

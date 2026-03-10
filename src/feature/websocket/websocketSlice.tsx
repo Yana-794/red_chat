@@ -26,12 +26,12 @@ const websocketSlise = createSlice({
         state.error = null;
       }
     },
-    setError(state, action: PayloadAction<string>){
-        state.status = 'error';
-        state.error = action.payload;
-    }
+    setError(state, action: PayloadAction<string>) {
+      state.status = "error";
+      state.error = action.payload;
+    },
   },
 });
-export const {setConnectionStatus, setError} = websocketSlise.actions;
+export const { setConnectionStatus, setError } = websocketSlise.actions;
 
-export default websocketSlise.reducer
+export default websocketSlise.reducer;
