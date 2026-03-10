@@ -8,7 +8,7 @@ export const messagesThunk = createAsyncThunk(
     try {
       dispatch(setLoading(true));
       const response = await fetch(
-        `${API_BASE_URL}/api/messages?/limit=${limit}`,
+       `${API_BASE_URL}/api/messages?limit=${limit}`,
         {
           method: "GET",
           credentials: "include",
@@ -49,9 +49,7 @@ export const olderMessagesThunk = createAsyncThunk(
            const response = await fetch(url, {
             method: 'GET',
             credentials:'include',
-            headers: {
-                'Contetnt-Type': 'application/json',
-            }
+            headers: { 'Content-Type': 'application/json' }
            });
            if(!response.ok){
             if(response.status === 401){

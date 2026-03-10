@@ -20,11 +20,10 @@ export default function UserMessagesPage() {
   const username = params.username;
 
   useEffect(() => {
-    // Проверяем, что username в URL совпадает с текущим пользователем
-    if (!isAuth) {
-      router.push('/login');
-      return;
-    }
+    // if (!isAuth) {
+    //   router.push('/login');
+    //   return;
+    // }
 
     // Загружаем сообщения
     dispatch(messagesThunk(50));
@@ -32,7 +31,6 @@ export default function UserMessagesPage() {
     // Подключаемся к WebSocket
     websocketService.connect(dispatch);
 
-    // Сбрасываем счетчик непрочитанных при заходе в чат
     dispatch(resetUnread());
 
     return () => {

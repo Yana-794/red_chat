@@ -4,7 +4,25 @@ import { HeadType } from "@/src/ui/components/head";
 import RegisterForm from "@/src/feature/auth/ui/registerForm";
 import UpLink from "@/src/ui/components/up-link";
 import Safety from "@/src/ui/components/safety";
+import { useAppSelector } from "@/src/store/hooks";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 const RegisterPage = () => {
+  const router = useRouter();
+  const { isAuth } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    // Если уже авторизован - редирект в чат
+    if (isAuth) {
+      router.push("/chat");
+    }
+  }, [isAuth, router]);
+
+  // Если авторизован - не показываем форму
+  if (isAuth) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative bg-[#0a0e27]">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -52,11 +70,7 @@ const RegisterPage = () => {
         >
           <Head type={HeadType.REGISTER} />
           <RegisterForm />
-          <UpLink
-            authQuestion="Есть аккаунт"
-            formType="Войти"
-            to="/login"
-          />
+          <UpLink authQuestion="Есть аккаунт" formType="Войти" to="/login" />
         </div>
         <Safety />
       </div>

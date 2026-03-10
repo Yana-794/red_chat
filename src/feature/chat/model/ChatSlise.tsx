@@ -23,7 +23,7 @@ const initialState: ChatState = {
     id: 1,
     name: "Общий чат",
     description: "Основной чат приложения",
-    path: "/chat/general",
+    path: "/chat",
     unreadCount: 0,
   },
   isLoading: false,

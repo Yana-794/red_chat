@@ -7,7 +7,7 @@ export enum ENavigationKey {
 
 export interface ItemProfile {
     key: ENavigationKey;
-    path?: string;
+    path: string;
     label: string;
     icon: LucideIcon;
 }
