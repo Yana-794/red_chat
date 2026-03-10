@@ -3,8 +3,7 @@ import { addMessage } from "../messages/model/messagesSlice";
 import { setConnectionStatus, setError } from "./websocketSlice";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-const WS_URL = API_BASE_URL.replace(/^http/, "ws");
-
+const WS_URL = API_BASE_URL.replace(/^http(s?):\/\//, (_, s) => s ? 'wss://' : 'ws://');
 export interface WSMessage {
   Id: number;
   SenderId: number;
@@ -52,7 +51,7 @@ class WebSocketService {
       if (this.dispatch) {
         this.dispatch(addMessage({
           id: message.Id,
-          secondId: message.SenderId,
+          senderId: message.SenderId,
           username: message.Username,
           content: message.Content,
           createdAd: message.CreatedAt,

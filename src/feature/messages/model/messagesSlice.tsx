@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface Message {
   id: number;
-  secondId: number;
+  senderId: number;
   username: string;
   content: string;
   createdAd: string;

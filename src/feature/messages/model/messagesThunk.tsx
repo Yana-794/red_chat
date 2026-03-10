@@ -1,3 +1,4 @@
+'use client'
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {  addMessages, setError, setLoading, setMessages } from "./messagesSlice";
 

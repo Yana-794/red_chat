@@ -61,7 +61,7 @@ const MessageList: React.FC = ({
     <div className="space-y-5 md:space-y-7">
    
     {messages.map((message) => {
-      const isOwnMessage = message.secondId === currentUser?.id;
+      const isOwnMessage = message.senderId === currentUser?.id;
       return(
         <div
         key={message.id}
