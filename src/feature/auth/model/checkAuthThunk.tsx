@@ -5,7 +5,7 @@ export const checkAuthThunk = createAsyncThunk(
   "auth/check",
   async (_, { dispatch, rejectWithValue }) => {
     try {
-      const response = await fetch("https://redchat.space/api/messages?limit=1", {
+      const response = await fetch("http://localhost:8080/api/messages?limit=1", {
         method: "GET",
         credentials: "include",
         headers: {

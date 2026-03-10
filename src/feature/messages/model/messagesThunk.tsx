@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {  addMessages, setError, setLoading, setMessages } from "./messagesSlice";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://redchat.space";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 export const messagesThunk = createAsyncThunk(
   "messages/fetch",
   async (limit: number = 50, { dispatch, rejectWithValue }) => {

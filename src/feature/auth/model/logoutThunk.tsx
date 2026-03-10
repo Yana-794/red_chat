@@ -5,7 +5,7 @@ export const logoutThink = createAsyncThunk(
   "auth/logout",
   async (_, { dispatch }) => {
     try {
-      await fetch("https://redchat.space/api/logout", {
+      await fetch("http://localhost:8080/api/logout", {
         method: "POST",
         credentials: "include",
       });

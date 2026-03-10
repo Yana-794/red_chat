@@ -1,68 +1,31 @@
+
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface Chat {
   id: number;
   name: string;
+  description: string;
+  path: string;
+  // Для общего чата всегда один
+  unreadCount?: number;
   lastMessage?: string;
   lastMessageTime?: string;
-  unreadCount?: number;
-  avatar?: string;
-  path: string;
-  online: number | null;
-  description: string;
 }
 
 interface ChatState {
-  chats: Chat[];
-  activeChat: Chat | null;
+  currentChat: Chat | null; // Только текущий чат (общий)
   isLoading: boolean;
   error: string | null;
 }
 
 const initialState: ChatState = {
-  chats: [
-    {
-      id: 1,
-      name: "Генеральный чат",
-      description: "Основной общий чат",
-      online: 12,
-      path: "/chat/general",
-      lastMessage: "Добро пожаловать!",
-      lastMessageTime: new Date().toISOString(),
-      unreadCount: 0,
-    },
-    {
-      id: 2,
-      name: "Чат 2",
-      description: "общий чат 2",
-      online: 5,
-      path: "/chat/chat2",
-      lastMessage: "Привет всем!",
-      lastMessageTime: new Date().toISOString(),
-      unreadCount: 2,
-    },
-    {
-      id: 3,
-      name: "Чат 3",
-      description: "общий чат 3",
-      online: 8,
-      path: "/chat/chat3",
-      lastMessage: "Как дела?",
-      lastMessageTime: new Date().toISOString(),
-      unreadCount: 0,
-    },
-    {
-      id: 4,
-      name: "Важное",
-      description: "Важное",
-      online: 3,
-      path: "/chat/important",
-      lastMessage: "Обновление системы",
-      lastMessageTime: new Date().toISOString(),
-      unreadCount: 1,
-    },
-  ],
-  activeChat: null,
+  currentChat: {
+    id: 1,
+    name: "Общий чат",
+    description: "Основной чат приложения",
+    path: "/chat/general",
+    unreadCount: 0,
+  },
   isLoading: false,
   error: null,
 };
@@ -71,42 +34,44 @@ const chatSlice = createSlice({
   name: "chat",
   initialState,
   reducers: {
-    setActiveChat(state, action: PayloadAction<Chat>) {
-      state.activeChat = action.payload;
-      const chat = state.chats.find((c) => c.id === action.payload.id);
-      if (chat) {
-        chat.unreadCount = 0; // обнуляем счетчик непроситанных
-      }
+    setCurrentChat(state, action: PayloadAction<Chat>) {
+      state.currentChat = action.payload;
     },
-    updateChatLastMessage(
+    updateLastMessage(
       state,
-      action: PayloadAction<{ chatId: number; message: string; time: string }>,
+      action: PayloadAction<{ message: string; time: string }>
     ) {
-      const chat = state.chats.find((c) => c.id === action.payload.chatId); //Находит чат по ID
-      if (chat) {
-        chat.lastMessage = action.payload.message;
-        chat.lastMessageTime = action.payload.time;
-        // Увеличиваем счетчик непрочитанных, если чат не активен
-        if (state.activeChat?.id !== action.payload.chatId) {
-          chat.unreadCount = (chat?.unreadCount || 0) + 1;
-        }
+      if (state.currentChat) {
+        state.currentChat.lastMessage = action.payload.message;
+        state.currentChat.lastMessageTime = action.payload.time;
       }
     },
-    setChats(state, action: PayloadAction<Chat[]>){
-        state.chats = action.payload;  // Полная замена массива чатов
-
+    incrementUnread(state) {
+      if (state.currentChat) {
+        state.currentChat.unreadCount = (state.currentChat.unreadCount || 0) + 1;
+      }
     },
-    setLoading(state, action: PayloadAction<boolean>){
-        state.isLoading = action.payload;  // Установка состояния загрузки
-
+    resetUnread(state) {
+      if (state.currentChat) {
+        state.currentChat.unreadCount = 0;
+      }
     },
-
-    setError(state, action:PayloadAction<string | null>){
-        state.error = action.payload;  // Установка/очистка ошибки
+    setLoading(state, action: PayloadAction<boolean>) {
+      state.isLoading = action.payload;
+    },
+    setError(state, action: PayloadAction<string | null>) {
+      state.error = action.payload;
     },
   },
 });
 
+export const {
+  setCurrentChat,
+  updateLastMessage,
+  incrementUnread,
+  resetUnread,
+  setLoading,
+  setError,
+} = chatSlice.actions;
 
-export const {setActiveChat, updateChatLastMessage, setChats, setLoading, setError  } = chatSlice.actions
-export default chatSlice.reducer
+export default chatSlice.reducer;
