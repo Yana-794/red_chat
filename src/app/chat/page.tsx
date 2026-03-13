@@ -18,26 +18,42 @@ export default function UserMessagesPage() {
   const dispatch = useAppDispatch();
   const { isAuth } = useAppSelector((state) => state.auth);
   const username = params.username;
-
+  
+  // Флаг для отслеживания первого рендера
+  
+  // Отдельный эффект для редиректа (без зависимостей от router в основном эффекте)
   useEffect(() => {
-    // if (!isAuth) {
-    //   router.push('/login');
-    //   return;
-    // }
+    if (!isAuth) {
+      router.push('/login');
+    }
+  }, [isAuth, router]); // router остается только здесь!
+
+  // Основной эффект для загрузки данных и WebSocket
+  useEffect(() => {
+    // Не продолжаем, если не авторизован
+    if (!isAuth) return;
+
+    console.log("🟢 Настройка WebSocket и загрузка сообщений");
 
     // Загружаем сообщения
     dispatch(messagesThunk(50));
-    
-    // Подключаемся к WebSocket
-    websocketService.connect(dispatch);
-
     dispatch(resetUnread());
 
+    // Подключаемся к WebSocket ТОЛЬКО если еще не подключены
+    if (!websocketService.isConnected()) {
+      websocketService.connect(dispatch);
+    } else {
+      console.log("WebSocket уже подключен, пропускаем...");
+    }
+
+    // Очистка при размонтировании
     return () => {
+      console.log("🔴 Очистка WebSocket соединения");
       websocketService.disconnect();
       dispatch(setConnectionStatus('disconnected'));
     };
-  }, [dispatch, isAuth, router, username]);
+  // ✅ Убираем router из зависимостей!
+  }, [dispatch, isAuth, username]); // Только нужные зависимости
 
   return (
     <div className="flex h-screen w-full overflow-hidden">

@@ -1,29 +1,36 @@
-import React from "react";
-
+import React, {  useEffect } from "react";
 import { Check, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useAppDispatch, useAppSelector } from "@/src/store/hooks";
-
-
 import { deleteMessageThunk } from "@/src/feature/messages/model/deleteMessageThunk";
 
-
-
-const MessageList: React.FC = ({
- 
-}) => {
+const MessageList: React.FC = () => {
   const dispatch = useAppDispatch();
   const { messages, isLoading } = useAppSelector((state) => state.message);
   const currentUser = useAppSelector((state) => state.auth.user);
- const handleDeleteMessage = async (messageId: number) => {
-  if (window.confirm("Удалить сообщение?")) {
-    try {
-      await dispatch(deleteMessageThunk(messageId)).unwrap();
-    } catch (error) {
-      console.error("Error deleting message:", error);
+
+  // Отладка
+  useEffect(() => {
+    console.log("📊 Текущий пользователь:", currentUser);
+    console.log("📊 Первое сообщение:", messages[0]);
+    if (currentUser && messages.length > 0) {
+      console.log("📊 Сравнение ID:", {
+        currentUserId: currentUser.id,
+        messageSenderId: messages[0].senderId,
+        равны: currentUser.id === messages[0].senderId,
+      });
     }
-  }
-};
+  }, [currentUser, messages]);
+
+  const handleDeleteMessage = async (messageId: number) => {
+    if (window.confirm("Удалить сообщение?")) {
+      try {
+        await dispatch(deleteMessageThunk(messageId)).unwrap();
+      } catch (error) {
+        console.error("Error deleting message:", error);
+      }
+    }
+  };
 
   const formTime = (dateString: string) => {
     try {
@@ -59,28 +66,34 @@ const MessageList: React.FC = ({
 
   return (
     <div className="space-y-5 md:space-y-7">
-   
-    {messages.map((message) => {
-      const isOwnMessage = message.senderId === currentUser?.id;
-      return(
-        <div
-        key={message.id}
-        className={`flex items-start gap-3 animate-slideIn group ${
+      {messages.map((message) => {
+        // Приводим к одному типу (число)
+        const isOwnMessage =
+          Number(message.senderId) === Number(currentUser?.id);
+
+        return (
+          <div
+            key={message.id}
+            className={`flex items-start gap-3 animate-slideIn group ${
               isOwnMessage ? "flex-row-reverse" : ""
             }`}
-        >
-{/* Аватар отправителя */}
+          >
+            {/* Аватар отправителя */}
             <div className="w-8 h-8 md:w-9 md:h-9 bg-linear-to-br from-red-600 to-red-700 rounded-xl flex items-center justify-center font-bold text-white shadow-lg shadow-red-900/50 shrink-0 text-xs md:text-sm">
               {message.username?.[0]?.toUpperCase() || "U"}
             </div>
-            <div className={`flex-1 min-w-0 ${isOwnMessage ? "flex justify-end" : ""}`}>
-              <div  className={`
+            <div
+              className={`flex-1 min-w-0 ${isOwnMessage ? "flex justify-end" : ""}`}
+            >
+              <div
+                className={`
                   bg-[#0f1422]/80 backdrop-blur-sm border border-red-900/30 
                   text-white p-2.5 md:p-3 rounded-xl shadow-lg 
                   max-w-[85%] md:max-w-md relative group
                   ${isOwnMessage ? "rounded-tr-none" : "rounded-tl-none"}
-                `}>
- {!isOwnMessage && (
+                `}
+              >
+                {!isOwnMessage && (
                   <p className="text-red-400 font-medium text-xs md:text-sm mb-0.5 md:mb-1 truncate">
                     {message.username}
                   </p>
@@ -89,14 +102,13 @@ const MessageList: React.FC = ({
                   <p className="text-gray-100 text-sm md:text-base wrap-break-word whitespace-pre-wrap flex-1 min-w-0">
                     {message.content}
                   </p>
-                   <div className="flex items-center gap-1 shrink-0">
-                      <span className="text-gray-400 text-xs">
+                  <div className="flex items-center gap-1 shrink-0">
+                    <span className="text-gray-400 text-xs">
                       {formTime(message.createdAd)}
                     </span>
-                       {isOwnMessage && (
-                      <>
+                    {isOwnMessage && (
+                      <div className="flex items-center gap-1">
                         <Check className="w-3 h-3 text-blue-400" />
-                        {/* Кнопка удаления для своих сообщений */}
                         <button
                           onClick={() => handleDeleteMessage(message.id)}
                           className="opacity-0 group-hover:opacity-100 transition-opacity ml-1 hover:text-red-400"
@@ -104,16 +116,15 @@ const MessageList: React.FC = ({
                         >
                           <Trash2 className="w-3 h-3" />
                         </button>
-                      </>
+                      </div>
                     )}
-                   </div>
+                  </div>
                 </div>
               </div>
             </div>
-
-        </div>
-      )
-    })}
+          </div>
+        );
+      })}
     </div>
   );
 };

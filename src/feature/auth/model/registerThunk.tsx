@@ -25,7 +25,7 @@ export const registerThunk = createAsyncThunk(
       }
 
       const data = await response.json();
-      dispatch(loginSuccess({ username: data.username }));
+      dispatch(loginSuccess({ username: data.username , id: data.id}));
       return data;
     } catch (error: unknown) {
         dispatch(logout());

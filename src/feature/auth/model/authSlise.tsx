@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface User {
-  id?: number;
+  id: number;
   username: string;
 }
 
@@ -28,13 +28,14 @@ const authSlice = createSlice({
     setLoading(state, action: PayloadAction<boolean>) {
       state.isLoading = action.payload;
     },
-    loginSuccess(state, action: PayloadAction<{ username: string }>) {
+    loginSuccess(state, action: PayloadAction<{ username: string, id: number }>) {
       state.isAuth = true;
       state.isError = false;
       state.isLoading = false;
       state.errorMessage = "";
       state.user = {
         username: action.payload.username,
+        id: action.payload.id,
       };
     },
 
@@ -55,14 +56,14 @@ const authSlice = createSlice({
       state.user = null;
     },
 
-    checkAuthSuccess(state, action: PayloadAction<{ username: string; id?: number }>) {
+    checkAuthSuccess(state, action: PayloadAction<{ username: string; id: number }>) {
       state.isAuth = true;
       state.user ={
         id: action.payload.id,
         username: action.payload.username,
       }
     },
-    updateUser(state, action: PayloadAction<{ username: string; id?: number }>){
+    updateUser(state, action: PayloadAction<{ username: string; id: number }>){
       state.user = {
         id: action.payload.id,
         username: action.payload.username
