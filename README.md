@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🔴 Red Chat
 
-## Getting Started
+Real-time чат с кровавым интерфейсом. Мгновенные сообщения, никакой истории — только здесь и сейчас.
 
-First, run the development server:
+![Red Chat Preview](https://via.placeholder.com/800x400/1a1a2e/ff0040?text=Red+Chat)
+
+## ✨ Фичи
+
+- ⚡ **Real-time сообщения** через WebSocket
+- 🎨 **Кровавый дизайн** в красных тонах
+- 🔐 **Простая авторизация** (регистрация за 5 секунд)
+- 🗑️ **Удаление своих сообщений**
+- 📱 **Адаптивность** на всех устройствах
+- 🔄 **Автоподключение** при обрыве связи
+
+## 🚀 Быстрый старт
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+# Клонируем
+git clone <your-repo>
+cd red-chat
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Ставим зависимости
+npm install
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Запускаем одной командой
+npm run dev:all

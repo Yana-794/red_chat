@@ -11,13 +11,30 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
+
+// Разрешенные origin для CORS
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://red-chat-pink.vercel.app', // ваш Vercel URL
+  // Добавьте другие домены если нужно
+];
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: function(origin, callback) {
+    // Разрешаем запросы без origin (например, мобильные приложения)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'CORS policy не разрешает этот origin';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true
 }));
+
 app.use(express.json());
 app.use(cookieParser());
 

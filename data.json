@@ -29,6 +29,11 @@
       "id": 6,
       "username": "rhn",
       "password": "12345"
+    },
+    {
+      "id": 7,
+      "username": "Yana",
+      "password": "456"
     }
   ],
   "messages": [
@@ -101,6 +106,41 @@
       "username": "rhn",
       "content": "ijiijij",
       "createdAt": "2026-03-14T12:37:52.355Z"
+    },
+    {
+      "id": 1773492892913,
+      "senderId": 3,
+      "username": "test",
+      "content": "frhfhr",
+      "createdAt": "2026-03-14T12:54:52.913Z"
+    },
+    {
+      "id": 1773492909958,
+      "senderId": 3,
+      "username": "test",
+      "content": "vrvrv",
+      "createdAt": "2026-03-14T12:55:09.958Z"
+    },
+    {
+      "id": 1773492939806,
+      "senderId": 7,
+      "username": "Yana",
+      "content": "привет",
+      "createdAt": "2026-03-14T12:55:39.806Z"
+    },
+    {
+      "id": 1773492969893,
+      "senderId": 3,
+      "username": "test",
+      "content": "привет яна",
+      "createdAt": "2026-03-14T12:56:09.893Z"
+    },
+    {
+      "id": 1773492996177,
+      "senderId": 3,
+      "username": "test",
+      "content": "как дела?",
+      "createdAt": "2026-03-14T12:56:36.177Z"
     }
   ]
 }
