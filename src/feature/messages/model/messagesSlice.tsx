@@ -5,7 +5,7 @@ export interface Message {
   senderId: number;
   username: string;
   content: string;
-  createdAd: string;
+  createdAt: string;
 }
 
 interface MessagesState {

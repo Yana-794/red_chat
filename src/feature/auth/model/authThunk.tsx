@@ -24,6 +24,7 @@ export const loginThunk = createAsyncThunk(
       dispatch(
         loginSuccess({
           username: data.username,
+          id: data.id
         }),
       );
       return data;

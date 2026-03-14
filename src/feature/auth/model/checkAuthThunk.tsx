@@ -5,7 +5,8 @@ export const checkAuthThunk = createAsyncThunk(
   "auth/check",
   async (_, { dispatch, rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:8080/api/messages?limit=1", {
+      // Используем /api/me для получения данных пользователя
+      const response = await fetch("http://localhost:8080/api/me", {
         method: "GET",
         credentials: "include",
         headers: {
@@ -14,6 +15,7 @@ export const checkAuthThunk = createAsyncThunk(
       });
 
       if (response.status === 401) {
+        console.log("🔴 Пользователь не авторизован");
         dispatch(logout());
         return rejectWithValue("Not authenticated");
       }
@@ -22,16 +24,20 @@ export const checkAuthThunk = createAsyncThunk(
         throw new Error("Failed to check auth");
       }
 
-      // Пытаемся получить информацию о пользователе из куки или отдельного эндпоинта
-      // Если нет отдельного эндпоинта, можно сохранить username из localStorage
-      const username = localStorage.getItem("username");
-      if (username) {
-        dispatch(checkAuthSuccess({ username }));
-      }
+      const userData = await response.json();
+      console.log("✅ Пользователь авторизован:", userData);
+      
+      // Сохраняем username в localStorage для других компонентов
+      localStorage.setItem("username", userData.username);
+      
+      dispatch(checkAuthSuccess({
+        id: userData.id,
+        username: userData.username
+      }));
 
-      return { authenticated: true };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      return { authenticated: true, user: userData };
     } catch (error) {
+      console.error("❌ Auth check failed:", error);
       dispatch(logout());
       return rejectWithValue("Auth check failed");
     }
