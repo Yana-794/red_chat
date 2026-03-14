@@ -50,7 +50,7 @@ const InputMessage: React.FC = () => {
         <button
           type="submit"
           disabled={!isConnected || !message.trim() || isSending}
-          className="bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white p-2.5 md:p-3 rounded-xl flex items-center justify-center shadow-lg shadow-red-900/50 transition-all duration-200 shrink-0"
+          className="bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-rose-600 disabled:to-red-600 disabled:cursor-not-allowed text-white p-2.5 md:p-3 rounded-xl flex items-center justify-center shadow-lg shadow-red-900/50 transition-all duration-200 shrink-0"
         >
           <Send className="w-4 h-4 md:w-5 md:h-5" />
         </button>

@@ -19,8 +19,11 @@ export interface WSMessage {
 class WebSocketService {
   private socket: ReconnectingWebSocket | null = null;
   private dispatch: Dispatch | null = null;
+  private isConnecting: boolean = false;
 
   private handleOpen = () => {
+    console.log("WebSocket connected successfully");
+    this.isConnecting = false;
     if (this.dispatch) {
       this.dispatch(setConnectionStatus("connected"));
     }
@@ -36,7 +39,7 @@ class WebSocketService {
             senderId: message.senderId,
             username: message.username,
             content: message.content,
-            createdAd: message.createdAt,
+            createdAt: message.createdAt,
           }),
         );
       }
@@ -46,12 +49,16 @@ class WebSocketService {
   };
 
   private handleClose = () => {
+    console.log("WebSocket disconnected");
+    this.isConnecting = false;
     if (this.dispatch) {
       this.dispatch(setConnectionStatus("disconnected"));
     }
   };
 
   private handleError = () => {
+    console.error("WebSocket error:");
+    this.isConnecting = false;
     if (this.dispatch) {
       this.dispatch(setConnectionStatus("error"));
       this.dispatch(setError("Ошибка WebSocket"));
@@ -61,20 +68,32 @@ class WebSocketService {
   connect(dispatch: Dispatch) {
     this.dispatch = dispatch;
 
-    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      console.log('"WebSocket уже подключен"');
-      return;
+    // Проверяем состояние соединения
+    if (this.socket) {
+      if (this.socket.readyState === WebSocket.OPEN) {
+        console.log("WebSocket уже подключен");
+        return;
+      }
+      if (this.isConnecting) {
+        console.log("WebSocket уже подключается");
+        return;
+      }
     }
 
     try {
+      this.isConnecting = true;
+      this.dispatch(setConnectionStatus("connecting"));
+      
+      console.log("Connecting to WebSocket:", `${WS_URL}/ws`);
+      
       this.socket = new ReconnectingWebSocket(`${WS_URL}/ws`, [], {
         maxRetries: 10,
         minReconnectionDelay: 1000,
         maxReconnectionDelay: 3000,
-        maxEnqueuedMessages: 0,
-        reconnectionDelayGrowFactor: 1.5,
+        reconnectionDelayGrowFactor: 1.3,
         connectionTimeout: 4000,
-        debug: process.env.NODE_ENV === "development",
+        maxEnqueuedMessages: 0,
+        debug: true, // Включите для отладки
       });
 
       this.socket.addEventListener("open", this.handleOpen);
@@ -83,35 +102,27 @@ class WebSocketService {
       this.socket.addEventListener("error", this.handleError);
     } catch (error) {
       console.error("Ошибка при создании WebSocket", error);
+      this.isConnecting = false;
       if (this.dispatch) {
         this.dispatch(setError("Ошибка подключения WebSocket"));
       }
     }
   }
 
-  /**
-   * Отключение от WebSocket
-   */
   disconnect() {
     if (this.socket) {
-      // Удаляем обработчики
       this.socket.removeEventListener("open", this.handleOpen);
       this.socket.removeEventListener("message", this.handleMessage);
       this.socket.removeEventListener("close", this.handleClose);
       this.socket.removeEventListener("error", this.handleError);
-
-      // Закрываем соединение
+      
       this.socket.close();
       this.socket = null;
     }
+    this.isConnecting = false;
     this.dispatch = null;
   }
 
-  /**
-   * Отправить сообщение
-   * @param content - содержимое сообщения
-   * @returns true, если сообщение успешно отправлено, иначе false
-   */
   sendMessage(content: string): boolean {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       try {
@@ -122,14 +133,11 @@ class WebSocketService {
         return false;
       }
     }
-    console.warn("WebSocket не подключен или закрыт");
+    console.warn("WebSocket не подключен. State:", this.socket?.readyState);
     return false;
   }
 
-  /**
-   * Проверка, активно ли соединение
-   */
-  isConnection(): boolean {
+  isConnected(): boolean {
     return this.socket?.readyState === WebSocket.OPEN;
   }
 }

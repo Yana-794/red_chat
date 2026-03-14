@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import { WebSocketServer, WebSocket } from 'ws';
+import { WebSocketServer } from 'ws';
 import { fileURLToPath } from 'url';
-import { dirname,  } from 'path';
+import { dirname } from 'path';
+import fs from 'fs';
+import path from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,15 +21,49 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// Путь к файлу с данными
+const DATA_FILE = path.join(__dirname, 'data.json');
 
+// Структура данных
+let data = {
+  users: [],
+  messages: []
+};
 
+// Загрузка данных из файла
+function loadData() {
+  try {
+    if (fs.existsSync(DATA_FILE)) {
+      const fileData = fs.readFileSync(DATA_FILE, 'utf8');
+      data = JSON.parse(fileData);
+    } else {
+      // Начальные данные
+      data = {
+        users: [
+          { id: 1, username: 'Алиса', password: '123' },
+          { id: 2, username: 'Боб', password: '123' },
+          { id: 3, username: 'test', password: 'test' }
+        ],
+        messages: []
+      };
+      saveData();
+    }
+  } catch (error) {
+    console.error('Ошибка загрузки данных:', error);
+  }
+}
 
-// Данные пользователей
-let users = [
-  { id: 1, username: 'Алиса', password: '123' },
-  { id: 2, username: 'Боб', password: '123' },
-  { id: 3, username: 'test', password: 'test' }
-];
+// Сохранение данных в файл
+function saveData() {
+  try {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Ошибка сохранения данных:', error);
+  }
+}
+
+// Загружаем данные при старте
+loadData();
 
 // Регистрация нового пользователя
 app.post('/api/register', (req, res) => {
@@ -37,17 +73,21 @@ app.post('/api/register', (req, res) => {
     return res.status(400).json({ error: 'Username and password required' });
   }
   
-  if (users.find(u => u.username === username)) {
+  if (data.users.find(u => u.username === username)) {
     return res.status(409).json({ error: 'Пользователь уже существует' });
   }
   
+  // Генерируем новый ID
+  const newId = data.users.length > 0 ? Math.max(...data.users.map(u => u.id)) + 1 : 1;
+  
   const newUser = {
-    id: users.length + 1,
+    id: newId,
     username,
     password
   };
   
-  users.push(newUser);
+  data.users.push(newUser);
+  saveData();
   
   res.cookie('jwt', `fake-jwt-token-${newUser.id}`, {
     httpOnly: true,
@@ -58,6 +98,7 @@ app.post('/api/register', (req, res) => {
   res.status(201).json({
     message: 'token generated',
     username,
+    id: newUser.id,
     token: `fake-jwt-token-${newUser.id}`
   });
 });
@@ -66,10 +107,7 @@ app.post('/api/register', (req, res) => {
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   
-  console.log('Login attempt:', { username, password });
-  console.log('Available users:', users);
-  
-  const user = users.find(u => u.username === username && u.password === password);
+  const user = data.users.find(u => u.username === username && u.password === password);
   
   if (!user) {
     return res.status(401).json({ error: 'Неверные учетные данные' });
@@ -84,7 +122,7 @@ app.post('/api/login', (req, res) => {
   res.json({
     message: 'token generated',
     username,
-      id: user.id,  
+    id: user.id,  
     token: `fake-jwt-token-${user.id}`
   });
 });
@@ -102,7 +140,7 @@ app.get('/api/me', (req, res) => {
   }
   
   const userId = parseInt(req.cookies.jwt.split('-').pop() || '0');
-  const user = users.find(u => u.id === userId);
+  const user = data.users.find(u => u.id === userId);
   
   if (!user) {
     return res.status(401).json({ error: 'Пользователь не найден' });
@@ -114,14 +152,14 @@ app.get('/api/me', (req, res) => {
   });
 });
 
-// Получение информации о пользователе (для getUserInfoThunk)
+// Получение информации о пользователе (алиас для /api/me)
 app.get('/api/user', (req, res) => {
   if (!req.cookies.jwt) {
     return res.status(401).json({ error: 'Не авторизован' });
   }
   
   const userId = parseInt(req.cookies.jwt.split('-').pop() || '0');
-  const user = users.find(u => u.id === userId);
+  const user = data.users.find(u => u.id === userId);
   
   if (!user) {
     return res.status(401).json({ error: 'Пользователь не найден' });
@@ -131,6 +169,16 @@ app.get('/api/user', (req, res) => {
     id: user.id,
     username: user.username
   });
+});
+
+// Получение списка всех пользователей (без паролей)
+app.get('/api/users', (req, res) => {
+  if (!req.cookies.jwt) {
+    return res.status(401).json({ error: 'Не авторизован' });
+  }
+  
+  const publicUsers = data.users.map(({ id, username }) => ({ id, username }));
+  res.json(publicUsers);
 });
 
 // Получение сообщений
@@ -142,13 +190,12 @@ app.get('/api/messages', (req, res) => {
     return res.status(401).json({ error: 'Не авторизован' });
   }
   
-  let sortedMessages = [...messages].sort((a, b) => 
-    new Date(a.CreatedAt).getTime() - new Date(b.CreatedAt).getTime()
+  let sortedMessages = [...data.messages].sort((a, b) => 
+    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   );
   
-  // Если указан beforeId, берем сообщения до этого ID
   if (beforeId) {
-    const beforeIndex = sortedMessages.findIndex(m => m.Id === beforeId);
+    const beforeIndex = sortedMessages.findIndex(m => m.id === beforeId);
     if (beforeIndex !== -1) {
       sortedMessages = sortedMessages.slice(0, beforeIndex);
     }
@@ -156,7 +203,6 @@ app.get('/api/messages', (req, res) => {
   
   const limitedMessages = sortedMessages.slice(-limit);
   
-  console.log(`Sending ${limitedMessages.length} messages`);
   res.json(limitedMessages);
 });
 
@@ -170,77 +216,64 @@ app.delete('/api/messages/:id', (req, res) => {
   
   const userId = parseInt(req.cookies.jwt.split('-').pop() || '0');
   
-  const messageIndex = messages.findIndex(m => m.Id === id);
+  const messageIndex = data.messages.findIndex(m => m.id === id);
   
   if (messageIndex === -1) {
     return res.status(404).json({ error: 'Сообщение не найдено' });
   }
   
-  if (messages[messageIndex].SenderId !== userId) {
+  if (data.messages[messageIndex].senderId !== userId) {
     return res.status(403).json({ error: 'Нет прав на удаление этого сообщения' });
   }
   
-  messages.splice(messageIndex, 1);
+  data.messages.splice(messageIndex, 1);
+  saveData();
   res.status(204).send();
 });
 
 // Запуск HTTP сервера
 const server = app.listen(PORT, () => {
   console.log(`Сервер запущен на http://localhost:${PORT}`);
-  console.log('Доступные пользователи:', users.map(u => ({ username: u.username, password: u.password })));
+  console.log(`WebSocket: ws://localhost:${PORT}/ws`);
+  console.log(`Доступные пользователи: ${data.users.map(u => u.username).join(', ')}`);
 });
 
 // Создание WebSocket сервера
 const wss = new WebSocketServer({ server, path: '/ws' });
 
-// Обработка WebSocket соединений
 wss.on('connection', (ws, req) => {
-  console.log('WebSocket подключен');
-  
   // Проверка авторизации через cookie
   const cookies = req.headers.cookie;
   if (!cookies || !cookies.includes('jwt')) {
-    console.log('WebSocket не авторизован - нет JWT cookie');
     ws.close(1008, 'Unauthorized');
     return;
   }
   
-  // Извлечение ID пользователя из cookie
   const jwtMatch = cookies.match(/jwt=fake-jwt-token-(\d+)/);
   const userId = jwtMatch ? parseInt(jwtMatch[1]) : null;
   
   if (!userId) {
-    console.log('WebSocket не авторизован - неверный токен');
     ws.close(1008, 'Unauthorized');
     return;
   }
   
-  // Поиск пользователя по ID
-  const user = users.find(u => u.id === userId);
+  const user = data.users.find(u => u.id === userId);
   
   if (!user) {
-    console.log('WebSocket не авторизован - пользователь не найден');
     ws.close(1008, 'Unauthorized');
     return;
   }
   
-  console.log(`WebSocket авторизован как пользователь: ${user.username} (ID: ${user.id})`);
-  
-  // Сохраняем информацию о пользователе для этого соединения
   const currentUser = user;
   
-  // Обработка входящих сообщений
-  ws.on('message', (data) => {
+  ws.on('message', (messageData) => {
     try {
-      const message = JSON.parse(data.toString());
-      console.log('Получено сообщение от пользователя:', currentUser.username);
+      const message = JSON.parse(messageData.toString());
       
-      // Проверка на пустое сообщение
       if (!message.content || message.content.trim() === '') {
         return;
       }
       
-      // Создание нового сообщения
       const newMessage = {
         id: Date.now(),
         senderId: currentUser.id,
@@ -249,11 +282,10 @@ wss.on('connection', (ws, req) => {
         createdAt: new Date().toISOString()
       };
       
-      // Добавление в массив сообщений
-      messages.push(newMessage);
-      console.log('Создано новое сообщение:', newMessage);
+      data.messages.push(newMessage);
+      saveData();
       
-      // Рассылка всем подключенным клиентам
+      // Рассылаем сообщение всем подключенным клиентам
       wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify(newMessage));
@@ -264,16 +296,21 @@ wss.on('connection', (ws, req) => {
       console.error('Ошибка при обработке сообщения:', error);
     }
   });
-  
-  // Обработка закрытия соединения
-  ws.on('close', () => {
-    console.log('WebSocket отключен');
-  });
-  
-  // Обработка ошибок
-  ws.on('error', (error) => {
-    console.error('Ошибка WebSocket:', error);
+});
+
+// Обработка graceful shutdown
+process.on('SIGINT', () => {
+  saveData();
+  wss.close();
+  server.close(() => {
+    process.exit(0);
   });
 });
 
-console.log(`WebSocket сервер запущен на ws://localhost:${PORT}/ws`);
+process.on('SIGTERM', () => {
+  saveData();
+  wss.close();
+  server.close(() => {
+    process.exit(0);
+  });
+});
