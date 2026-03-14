@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { loginSuccess, loginFailure, logout } from "@/src/feature/auth/model/authSlise";
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 export const loginThunk = createAsyncThunk(
   "auth/login",
   async (
@@ -8,7 +8,7 @@ export const loginThunk = createAsyncThunk(
     { dispatch, rejectWithValue },
   ) => {
     try {
-      const response = await fetch("http://localhost:8080/api/login", {
+      const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

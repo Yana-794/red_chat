@@ -1,12 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { checkAuthSuccess, logout } from "./authSlise";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 export const checkAuthThunk = createAsyncThunk(
   "auth/check",
   async (_, { dispatch, rejectWithValue }) => {
     try {
       // Используем /api/me для получения данных пользователя
-      const response = await fetch("http://localhost:8080/api/me", {
+      const response = await fetch(`${API_BASE_URL}/api/me`, {
         method: "GET",
         credentials: "include",
         headers: {
