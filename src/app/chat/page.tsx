@@ -8,7 +8,7 @@ import { websocketService } from "@/src/feature/websocket/websocketService";
 import { setConnectionStatus } from "@/src/feature/websocket/websocketSlice";
 import { resetUnread } from "@/src/feature/chat/model/ChatSlise";
 import Sidebar from "@/src/ui/layout/nav/sidebar";
-import InputMessage from "@/src/ui/layout/chat/inputMessage";
+import InputMessage from "@/src/feature/chat/ui/inputMessage";
 import MessageList from "@/src/ui/layout/chat/chatMessage";
 import Header from "@/src/ui/components/header";
 

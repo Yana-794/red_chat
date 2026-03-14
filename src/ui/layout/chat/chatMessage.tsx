@@ -1,4 +1,4 @@
-import React, {  useEffect } from "react";
+import React, {useState } from "react";
 import { Check, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useAppDispatch, useAppSelector } from "@/src/store/hooks";
@@ -6,28 +6,31 @@ import { deleteMessageThunk } from "@/src/feature/messages/model/deleteMessageTh
 
 const MessageList: React.FC = () => {
   const dispatch = useAppDispatch();
+
   const { messages, isLoading } = useAppSelector((state) => state.message);
   const currentUser = useAppSelector((state) => state.auth.user);
 
-  // Отладка
-  useEffect(() => {
-    console.log("📊 Текущий пользователь:", currentUser);
-    console.log("📊 Первое сообщение:", messages[0]);
-    if (currentUser && messages.length > 0) {
-      console.log("📊 Сравнение ID:", {
-        currentUserId: currentUser.id,
-        messageSenderId: messages[0].senderId,
-        равны: currentUser.id === messages[0].senderId,
-      });
-    }
-  }, [currentUser, messages]);
+  // Локальное состояние для ошибок удаления
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Проверка текущего пользователя
+  if (!currentUser) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <p className="text-gray-400">Пользователь не авторизован</p>
+      </div>
+    );
+  }
+
 
   const handleDeleteMessage = async (messageId: number) => {
     if (window.confirm("Удалить сообщение?")) {
       try {
         await dispatch(deleteMessageThunk(messageId)).unwrap();
+        setDeleteError(null);
       } catch (error) {
         console.error("Error deleting message:", error);
+        setDeleteError("Не удалось удалить сообщение");
       }
     }
   };
@@ -35,7 +38,8 @@ const MessageList: React.FC = () => {
   const formTime = (dateString: string) => {
     try {
       return format(new Date(dateString), "HH:mm");
-    } catch {
+    } catch  {
+      console.error("Invalid date string:", dateString);
       return "";
     }
   };
@@ -67,9 +71,7 @@ const MessageList: React.FC = () => {
   return (
     <div className="space-y-5 md:space-y-7">
       {messages.map((message) => {
-        // Приводим к одному типу (число)
-        const isOwnMessage =
-          Number(message.senderId) === Number(currentUser?.id);
+        const isOwnMessage = message.senderId === currentUser.id;
 
         return (
           <div
@@ -82,6 +84,8 @@ const MessageList: React.FC = () => {
             <div className="w-8 h-8 md:w-9 md:h-9 bg-linear-to-br from-red-600 to-red-700 rounded-xl flex items-center justify-center font-bold text-white shadow-lg shadow-red-900/50 shrink-0 text-xs md:text-sm">
               {message.username?.[0]?.toUpperCase() || "U"}
             </div>
+
+            {/* Контейнер сообщения */}
             <div
               className={`flex-1 min-w-0 ${isOwnMessage ? "flex justify-end" : ""}`}
             >
@@ -93,19 +97,25 @@ const MessageList: React.FC = () => {
                   ${isOwnMessage ? "rounded-tr-none" : "rounded-tl-none"}
                 `}
               >
+                {/* Имя отправителя для чужих сообщений */}
                 {!isOwnMessage && (
                   <p className="text-red-400 font-medium text-xs md:text-sm mb-0.5 md:mb-1 truncate">
                     {message.username}
                   </p>
                 )}
+
+                {/* Основной текст сообщения */}
                 <div className="flex items-end justify-between gap-2">
                   <p className="text-gray-100 text-sm md:text-base wrap-break-word whitespace-pre-wrap flex-1 min-w-0">
                     {message.content}
                   </p>
+
+                  {/* Время и кнопки */}
                   <div className="flex items-center gap-1 shrink-0">
                     <span className="text-gray-400 text-xs">
-                      {formTime(message.createdAd)}
+                      {formTime(message.createdAt)}
                     </span>
+
                     {isOwnMessage && (
                       <div className="flex items-center gap-1">
                         <Check className="w-3 h-3 text-blue-400" />
@@ -125,6 +135,11 @@ const MessageList: React.FC = () => {
           </div>
         );
       })}
+
+      {/* Обработка ошибок удаления */}
+      {deleteError && (
+        <div className="mt-2 text-red-500 text-sm">{deleteError}</div>
+      )}
     </div>
   );
 };
