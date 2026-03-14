@@ -34,6 +34,16 @@
       "id": 7,
       "username": "Yana",
       "password": "456"
+    },
+    {
+      "id": 8,
+      "username": "qwe",
+      "password": "qwert"
+    },
+    {
+      "id": 9,
+      "username": "agivagi",
+      "password": "123"
     }
   ],
   "messages": [
@@ -141,6 +151,20 @@
       "username": "test",
       "content": "как дела?",
       "createdAt": "2026-03-14T12:56:36.177Z"
+    },
+    {
+      "id": 1773497009703,
+      "senderId": 9,
+      "username": "agivagi",
+      "content": "rygr",
+      "createdAt": "2026-03-14T14:03:29.703Z"
+    },
+    {
+      "id": 1773497019927,
+      "senderId": 9,
+      "username": "agivagi",
+      "content": "dwdw",
+      "createdAt": "2026-03-14T14:03:39.927Z"
     }
   ]
 }

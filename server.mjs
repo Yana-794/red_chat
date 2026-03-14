@@ -14,15 +14,23 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 // Разрешенные origin для CORS
-// const allowedOrigins = [
-//   'http://localhost:3000',
-//   'https://red-chat-pink.vercel.app', // ваш Vercel URL
-//   // Добавьте другие домены если нужно
-// ];
+const allowedOrigins = [
+  'http://localhost:3000',
+  
+];
 
 // Middleware
 app.use(cors({
-  origin: true, // true разрешает текущий origin
+  origin: function(origin, callback) {
+    // Разрешаем запросы без origin (например, мобильные приложения)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'CORS policy не разрешает этот origin';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true
 }));
 
