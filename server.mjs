@@ -6,6 +6,8 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import fs from 'fs';
 import path from 'path';
+import multer from 'multer';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -80,7 +82,32 @@ function saveData() {
 
 // Загружаем данные при старте
 loadData();
+// Настройка multer для загрузки аватаров
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/avatars/');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'avatar-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
 
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Только изображения разрешены'));
+    }
+  }
+});
 // Регистрация нового пользователя
 app.post('/api/register', (req, res) => {
   const { username, password } = req.body;
@@ -168,6 +195,7 @@ app.get('/api/me', (req, res) => {
   });
 });
 
+
 // Получение информации о пользователе (алиас для /api/me)
 app.get('/api/user', (req, res) => {
   if (!req.cookies.jwt) {
@@ -187,6 +215,33 @@ app.get('/api/user', (req, res) => {
   });
 });
 
+app.put('/api/user/profile', upload.single('avatar'), (req, res) => {
+  if (!req.cookies.jwt) {
+    return res.status(401).json({ error: 'Не авторизован' });
+  }
+  
+  const userId = parseInt(req.cookies.jwt.split('-').pop() || '0');
+  const userIndex = users.findIndex(u => u.id === userId);
+  
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'Пользователь не найден' });
+  }
+  
+  const { username, description } = req.body;
+  const avatar = req.file ? `/uploads/avatars/${req.file.filename}` : null;
+  
+  // Обновляем данные пользователя
+  if (username) users[userIndex].username = username;
+  if (description) users[userIndex].description = description;
+  if (avatar) users[userIndex].avatar = avatar;
+  
+  res.json({
+    id: users[userIndex].id,
+    username: users[userIndex].username,
+    description: users[userIndex].description,
+    avatar: users[userIndex].avatar
+  });
+});
 // Получение списка всех пользователей (без паролей)
 app.get('/api/users', (req, res) => {
   if (!req.cookies.jwt) {

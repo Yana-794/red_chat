@@ -10,4 +10,5 @@ export interface ItemProfile {
     path: string;
     label: string;
     icon: LucideIcon;
+    isModal?: boolean;
 }

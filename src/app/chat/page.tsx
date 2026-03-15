@@ -67,7 +67,8 @@ export default function UserMessagesPage() {
     <div className="flex h-screen w-full overflow-hidden">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden relative">
-        <Header title={`Привет, ${user.username}!`} />
+        <Header title={`Привет, ${user.username}!`}
+        isChat={true} />
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <MessageList />
         </div>

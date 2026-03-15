@@ -14,157 +14,36 @@
       "id": 3,
       "username": "test",
       "password": "test"
-    },
-    {
-      "id": 4,
-      "username": "yana",
-      "password": "123"
-    },
-    {
-      "id": 5,
-      "username": "lia",
-      "password": "1234"
-    },
-    {
-      "id": 6,
-      "username": "rhn",
-      "password": "12345"
-    },
-    {
-      "id": 7,
-      "username": "Yana",
-      "password": "456"
-    },
-    {
-      "id": 8,
-      "username": "qwe",
-      "password": "qwert"
-    },
-    {
-      "id": 9,
-      "username": "agivagi",
-      "password": "123"
     }
   ],
   "messages": [
     {
-      "id": 1773490885608,
+      "id": 1773570881233,
+      "senderId": 3,
+      "username": "test",
+      "content": "Привет!",
+      "createdAt": "2026-03-15T10:34:41.233Z"
+    },
+    {
+      "id": 1773571408014,
+      "senderId": 3,
+      "username": "test",
+      "content": "как",
+      "createdAt": "2026-03-15T10:43:28.014Z"
+    },
+    {
+      "id": 1773571411085,
+      "senderId": 3,
+      "username": "test",
+      "content": "дела",
+      "createdAt": "2026-03-15T10:43:31.085Z"
+    },
+    {
+      "id": 1773572029688,
       "senderId": 3,
       "username": "test",
       "content": "wdwd",
-      "createdAt": "2026-03-14T12:21:25.608Z"
-    },
-    {
-      "id": 1773490908043,
-      "senderId": 4,
-      "username": "yana",
-      "content": "qwer",
-      "createdAt": "2026-03-14T12:21:48.043Z"
-    },
-    {
-      "id": 1773490912965,
-      "senderId": 4,
-      "username": "yana",
-      "content": "13243112",
-      "createdAt": "2026-03-14T12:21:52.965Z"
-    },
-    {
-      "id": 1773491085059,
-      "senderId": 5,
-      "username": "lia",
-      "content": "123",
-      "createdAt": "2026-03-14T12:24:45.059Z"
-    },
-    {
-      "id": 1773491088066,
-      "senderId": 5,
-      "username": "lia",
-      "content": "132",
-      "createdAt": "2026-03-14T12:24:48.066Z"
-    },
-    {
-      "id": 1773491496040,
-      "senderId": 4,
-      "username": "yana",
-      "content": "ссысы",
-      "createdAt": "2026-03-14T12:31:36.040Z"
-    },
-    {
-      "id": 1773491520567,
-      "senderId": 4,
-      "username": "yana",
-      "content": "выцыцы",
-      "createdAt": "2026-03-14T12:32:00.567Z"
-    },
-    {
-      "id": 1773491797660,
-      "senderId": 6,
-      "username": "rhn",
-      "content": "jkhjhkhk",
-      "createdAt": "2026-03-14T12:36:37.660Z"
-    },
-    {
-      "id": 1773491853935,
-      "senderId": 6,
-      "username": "rhn",
-      "content": "dwdwd",
-      "createdAt": "2026-03-14T12:37:33.935Z"
-    },
-    {
-      "id": 1773491872355,
-      "senderId": 6,
-      "username": "rhn",
-      "content": "ijiijij",
-      "createdAt": "2026-03-14T12:37:52.355Z"
-    },
-    {
-      "id": 1773492892913,
-      "senderId": 3,
-      "username": "test",
-      "content": "frhfhr",
-      "createdAt": "2026-03-14T12:54:52.913Z"
-    },
-    {
-      "id": 1773492909958,
-      "senderId": 3,
-      "username": "test",
-      "content": "vrvrv",
-      "createdAt": "2026-03-14T12:55:09.958Z"
-    },
-    {
-      "id": 1773492939806,
-      "senderId": 7,
-      "username": "Yana",
-      "content": "привет",
-      "createdAt": "2026-03-14T12:55:39.806Z"
-    },
-    {
-      "id": 1773492969893,
-      "senderId": 3,
-      "username": "test",
-      "content": "привет яна",
-      "createdAt": "2026-03-14T12:56:09.893Z"
-    },
-    {
-      "id": 1773492996177,
-      "senderId": 3,
-      "username": "test",
-      "content": "как дела?",
-      "createdAt": "2026-03-14T12:56:36.177Z"
-    },
-    {
-      "id": 1773497009703,
-      "senderId": 9,
-      "username": "agivagi",
-      "content": "rygr",
-      "createdAt": "2026-03-14T14:03:29.703Z"
-    },
-    {
-      "id": 1773497019927,
-      "senderId": 9,
-      "username": "agivagi",
-      "content": "dwdw",
-      "createdAt": "2026-03-14T14:03:39.927Z"
+      "createdAt": "2026-03-15T10:53:49.688Z"
     }
   ]
 }

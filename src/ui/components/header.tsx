@@ -1,12 +1,13 @@
 'use client'
-import React from "react";
+import React  from "react";
 import { useAppSelector } from "@/src/store/hooks";
 
 interface HeaderProps {
   title?: string;
+  isChat: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ title }) => {
+const Header: React.FC<HeaderProps> = ({ title, isChat }) => {
   const { status } = useAppSelector((state) => state.websocket);
   const { currentChat } = useAppSelector((state) => state.chat);
 
@@ -39,9 +40,9 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
           <h1 className="text-xl font-bold text-white">
             {title || currentChat?.name || "Чат"}
           </h1>
-          <p className="text-sm text-gray-400">
+         {isChat && (<p className="text-sm text-gray-400">
             {currentChat?.description || "Общий чат"}
-          </p>
+          </p>)}
         </div>
         <div className="flex items-center gap-2">
           <div className={`w-2 h-2 rounded-full ${getStatusColor()}`} />
