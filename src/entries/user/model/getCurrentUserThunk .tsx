@@ -23,6 +23,9 @@ export const getCurrentUserThunk = createAsyncThunk(
         throw new Error( error.error ||  "Ошибка загрузки пользователя" )
       }
       const data = await response.json();
+      if(data.avatar){
+        data.avatar = `${API_BASE_URL}${data.avatar}`
+      }
       dispatch(setUser(data))
       return data;
     } catch (error: unknown) {

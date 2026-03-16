@@ -41,7 +41,8 @@ const SidebarProfil: React.FC<Props> = ({ isOpen }) => {
 
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state.auth);
+  const { user: authUser } = useAppSelector((state) => state.auth);
+  const { user: profileUser } = useAppSelector((state) => state.user);
 
   const handleNavigation = (path: string) => {
     router.push(path);
@@ -58,8 +59,8 @@ const SidebarProfil: React.FC<Props> = ({ isOpen }) => {
     router.push("/login");
   };
 
-  const userName = user?.username || "Пользователь";
-
+  const userName = authUser?.username || "Пользователь";
+const userAvatar = profileUser?.avatar || authUser?.avatar;
   return (
     <>
       <div className="relative pb-5 px-2 pt-3 border-t border-red-900/30">
@@ -68,13 +69,14 @@ const SidebarProfil: React.FC<Props> = ({ isOpen }) => {
           className="w-full flex items-center gap-3 p-2 rounded-xl bg-[#0a0e27]/50 border border-red-900/30 hover:bg-red-900/20 transition-colors"
         >
           <div className="w-9 h-9 md:w-10 md:h-10 bg-linear-to-br from-red-600 to-red-700 rounded-xl flex items-center justify-center font-bold text-white shadow-lg shadow-red-900/50 shrink-0">
-            {user?.avatar ? (
+            {userAvatar? (
               <Image  
-                src={user.avatar} 
+                src={userAvatar} 
                 alt={userName} 
                 width={36}
                 height={36}
                 className="w-full h-full object-cover rounded-xl"
+                unoptimized 
               />
             ) : (
               <User size={18} />

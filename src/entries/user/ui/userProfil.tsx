@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
@@ -22,17 +23,17 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) 
   const dispatch = useAppDispatch();
   const { user, updateLoading } = useAppSelector((state) => state.user);
   
-  // Состояние для монтирования портала (для SSR совместимости)
   const [mounted, setMounted] = useState(false);
 
   const [formData, setFormData] = useState<UserFormData>({
-    username: user?.username || "",
-    description: user?.description || "",
-    avatarPreview: user?.avatar || null,
+     username: "",
+    description: "",
+    avatarPreview: null,
   });
   
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -49,20 +50,16 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) 
     }
   }, [isOpen, dispatch]);
 
+
+
+
   // Обновляем formData при изменении user
   useEffect(() => {
     if (isOpen && user) {
-      setFormData(prev => {
-        if (prev.username === user.username &&
-            prev.description === user.description &&
-            prev.avatarPreview === user.avatar) {
-          return prev;
-        }
-        return {
-          username: user.username || "",
-          description: user.description || "",
-          avatarPreview: user.avatar || null,
-        };
+      setFormData({
+        username: user.username || "",
+        description: user.description || "",
+        avatarPreview: user.avatar || '',
       });
     }
   }, [user, isOpen]);
@@ -149,6 +146,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) 
                   alt="Avatar"
                   width={96}
                   height={96}
+                  unoptimized 
                   className="w-full h-full object-cover"
                 />
               ) : (

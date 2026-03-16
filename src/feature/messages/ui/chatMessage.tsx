@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+/* eslint-disable react-hooks/set-state-in-effect */
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Check, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useAppDispatch, useAppSelector } from "@/src/store/hooks";
 import { deleteMessageThunk } from "@/src/feature/messages/model/deleteMessageThunk";
+import Image from "next/image";
 
 const MessageList: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -14,28 +16,53 @@ const MessageList: React.FC = () => {
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
 
   const { messages, isLoading } = useAppSelector((state) => state.message);
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
+  const [userAvatars, setUserAvatars] = useState<Record<number, string | null>>({});
+
   const currentUser = useAppSelector((state) => state.auth.user);
+  const {user: profilUser} = useAppSelector ((state) => state.user)
+
+   useEffect(() => {
+  if(profilUser?.avatar && profilUser?.id){
+    const avatar: string = profilUser.avatar; 
+    setUserAvatars(prev => ({
+      ...prev,
+      [profilUser.id]: avatar
+    }));
+  }
+}, [profilUser]);
+
+  const getUserAvatar = useCallback((senderId: number) => {
+    if(userAvatars[senderId]){
+      return userAvatars[senderId]
+    }
+    if(currentUser && senderId === currentUser.id && profilUser?.avatar){
+      return profilUser.avatar
+    }
+    return null;
+  }, [userAvatars, currentUser, profilUser]);
+  
+  const handleImageError = (messageId: number) => {
+    setImageErrors(prev => ({ ...prev, [messageId]: true }));
+  };
 
   // Локальное состояние для ошибок удаления
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Функция для прокрутки вниз
-  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
     messagesEndRef.current?.scrollIntoView({ behavior, block: "end" });
-  };
+  }, []);
 
   // Обработчик скролла для определения, нужно ли авто-прокручивать
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     if (!messagesContainerRef.current) return;
     
     const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
     // Если пользователь прокрутил почти до самого низа (с отступом в 100px)
     const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
     setShouldAutoScroll(isNearBottom);
-  };
-
-  // Прокрутка при загрузке сообщений
-
+  }, []);
 
   // Прокрутка при добавлении нового сообщения
   useEffect(() => {
@@ -43,13 +70,15 @@ const MessageList: React.FC = () => {
     
     if (hasNewMessage && shouldAutoScroll) {
       // Небольшая задержка для плавности
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         scrollToBottom("smooth");
       }, 50);
+      
+      return () => clearTimeout(timeoutId);
     }
     
     prevMessagesLengthRef.current = messages.length;
-  }, [messages.length, shouldAutoScroll]);
+  }, [messages.length, shouldAutoScroll, scrollToBottom]);
 
   // Проверка текущего пользователя
   if (!currentUser) {
@@ -114,6 +143,8 @@ const MessageList: React.FC = () => {
     >
       {messages.map((message) => {
         const isOwnMessage = message.senderId === currentUser.id;
+        const userAvatar = getUserAvatar(message.senderId);
+        const hasImageError = imageErrors[message.id];
 
         return (
           <div
@@ -123,8 +154,22 @@ const MessageList: React.FC = () => {
             }`}
           >
             {/* Аватар отправителя */}
-            <div className="w-8 h-8 md:w-9 md:h-9 bg-linear-to-br from-red-600 to-red-700 rounded-xl flex items-center justify-center font-bold text-white shadow-lg shadow-red-900/50 shrink-0 text-xs md:text-sm">
-              {message.username?.[0]?.toUpperCase() || "U"}
+            <div className="w-8 h-8 md:w-9 md:h-9 bg-linear-to-br from-red-600 to-red-700 rounded-xl flex items-center justify-center font-bold text-white shadow-lg shadow-red-900/50 shrink-0 text-xs md:text-sm overflow-hidden">
+              {userAvatar && !hasImageError ? (
+                <Image
+                  src={userAvatar}
+                  alt={message.username}
+                  width={36} 
+                  height={36}
+                  className="w-full h-full object-cover"
+                  unoptimized
+                  onError={() => handleImageError(message.id)}
+                />
+              ) : (
+                <span className="text-xs md:text-sm">
+                  {message.username?.[0]?.toUpperCase() || "U"}
+                </span>
+              )}
             </div>
 
             {/* Контейнер сообщения */}

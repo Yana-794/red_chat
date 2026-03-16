@@ -4,7 +4,7 @@ export interface User {
   id: number;
   username: string;
   description?: string;
-  avatar?: string;
+  avatar?: string | null;
 }
 
 export interface UserState {
@@ -44,7 +44,6 @@ const userSlice = createSlice({
 });
 export const {
   setUser,
-
   setUpdateLoading,
   setError,
   updateUser,

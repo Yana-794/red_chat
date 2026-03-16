@@ -21,6 +21,9 @@ export const updateUserProfileThunk = createAsyncThunk(
         }
       }
       const data = await response.json();
+      if(data.avatar){
+        data.avatar = `${API_BASE_URL}${data.avatar}`
+      }
       dispatch(updateUser(data));
       return data;
     } catch (error: unknown) {

@@ -8,7 +8,6 @@ import fs from 'fs';
 import path from 'path';
 import multer from 'multer';
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -18,25 +17,26 @@ const PORT = process.env.PORT || 8080;
 // Разрешенные origin для CORS
 const allowedOrigins = [
   'http://localhost:3000',
-  
+  'http://localhost:8080'
 ];
 
 // Middleware
 app.use(cors({
   origin: function(origin, callback) {
-    // Разрешаем запросы без origin (например, мобильные приложения)
     if (!origin) return callback(null, true);
-    
     if (allowedOrigins.indexOf(origin) === -1) {
       const msg = 'CORS policy не разрешает этот origin';
       return callback(new Error(msg), false);
     }
     return callback(null, true);
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Путь к файлу с данными
@@ -54,20 +54,38 @@ function loadData() {
     if (fs.existsSync(DATA_FILE)) {
       const fileData = fs.readFileSync(DATA_FILE, 'utf8');
       data = JSON.parse(fileData);
+      
+      data.users = data.users.map(user => ({
+        id: user.id,
+        username: user.username,
+        password: user.password,
+        description: user.description || '',
+        avatar: user.avatar || null
+      }));
+      
+      console.log('Данные загружены из файла');
     } else {
-      // Начальные данные
       data = {
         users: [
-          { id: 1, username: 'Алиса', password: '123' },
-          { id: 2, username: 'Боб', password: '123' },
-          { id: 3, username: 'test', password: 'test' }
+          { id: 1, username: 'Алиса', password: '123', description: '', avatar: null },
+          { id: 2, username: 'Боб', password: '123', description: '', avatar: null },
+          { id: 3, username: 'test', password: 'test', description: '', avatar: null }
         ],
         messages: []
       };
       saveData();
+      console.log('Созданы начальные данные');
     }
   } catch (error) {
     console.error('Ошибка загрузки данных:', error);
+    data = {
+      users: [
+        { id: 1, username: 'Алиса', password: '123', description: '', avatar: null },
+        { id: 2, username: 'Боб', password: '123', description: '', avatar: null },
+        { id: 3, username: 'test', password: 'test', description: '', avatar: null }
+      ],
+      messages: []
+    };
   }
 }
 
@@ -75,6 +93,7 @@ function loadData() {
 function saveData() {
   try {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
+    console.log('Данные сохранены в файл');
   } catch (error) {
     console.error('Ошибка сохранения данных:', error);
   }
@@ -82,20 +101,41 @@ function saveData() {
 
 // Загружаем данные при старте
 loadData();
+
+// ВАЖНО: Абсолютный путь к папке uploads
+const uploadDir = path.join(__dirname, 'uploads', 'avatars');
+console.log('Директория для загрузок:', uploadDir);
+
+// Создаем директорию для загрузок, если её нет
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log('Создана директория для загрузок');
+}
+
+// Проверяем права на запись
+try {
+  fs.accessSync(uploadDir, fs.constants.W_OK);
+  console.log('Директория доступна для записи');
+} catch (error) {
+  console.error('Ошибка доступа к директории:', error);
+}
+
 // Настройка multer для загрузки аватаров
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/avatars/');
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'avatar-' + uniqueSuffix + path.extname(file.originalname));
+    const filename = 'avatar-' + uniqueSuffix + path.extname(file.originalname);
+    console.log('Сохраняем файл:', filename);
+    cb(null, filename);
   }
 });
 
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
@@ -108,6 +148,17 @@ const upload = multer({
     }
   }
 });
+
+// ВАЖНО: Правильная настройка статической раздачи
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Добавляем middleware для логирования запросов к статике (для отладки)
+app.use('/uploads', (req, res, next) => {
+  console.log('Static request:', req.url);
+  console.log('Full path:', path.join(__dirname, 'uploads', req.url));
+  next();
+});
+
 // Регистрация нового пользователя
 app.post('/api/register', (req, res) => {
   const { username, password } = req.body;
@@ -120,13 +171,14 @@ app.post('/api/register', (req, res) => {
     return res.status(409).json({ error: 'Пользователь уже существует' });
   }
   
-  // Генерируем новый ID
   const newId = data.users.length > 0 ? Math.max(...data.users.map(u => u.id)) + 1 : 1;
   
   const newUser = {
     id: newId,
     username,
-    password
+    password,
+    description: '',
+    avatar: null
   };
   
   data.users.push(newUser);
@@ -189,14 +241,11 @@ app.get('/api/me', (req, res) => {
     return res.status(401).json({ error: 'Пользователь не найден' });
   }
   
-  res.json({
-    id: user.id,
-    username: user.username
-  });
+  const { password, ...userWithoutPassword } = user;
+  res.json(userWithoutPassword);
 });
 
-
-// Получение информации о пользователе (алиас для /api/me)
+// Получение информации о пользователе
 app.get('/api/user', (req, res) => {
   if (!req.cookies.jwt) {
     return res.status(401).json({ error: 'Не авторизован' });
@@ -209,57 +258,97 @@ app.get('/api/user', (req, res) => {
     return res.status(401).json({ error: 'Пользователь не найден' });
   }
   
-  res.json({
-    id: user.id,
-    username: user.username
-  });
+  const { password, ...userWithoutPassword } = user;
+  res.json(userWithoutPassword);
 });
 
-app.put('/api/user/profile', upload.single('avatar'), (req, res) => {
+// Обновление профиля пользователя
+app.put('/api/user/profile', (req, res, next) => {
   if (!req.cookies.jwt) {
     return res.status(401).json({ error: 'Не авторизован' });
   }
-  
-  const userId = parseInt(req.cookies.jwt.split('-').pop() || '0');
-  const userIndex = users.findIndex(u => u.id === userId);
-  
-  if (userIndex === -1) {
-    return res.status(404).json({ error: 'Пользователь не найден' });
+  next();
+}, upload.single('avatar'), (req, res) => {
+  try {
+    console.log('Обновление профиля, файл:', req.file);
+    
+    const userId = parseInt(req.cookies.jwt.split('-').pop() || '0');
+    const userIndex = data.users.findIndex(u => u.id === userId);
+    
+    if (userIndex === -1) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
+    
+    const { username, description } = req.body;
+    
+    if (username && username.trim() !== '') {
+      const existingUser = data.users.find(u => u.username === username && u.id !== userId);
+      if (existingUser) {
+        return res.status(409).json({ error: 'Это имя пользователя уже занято' });
+      }
+      data.users[userIndex].username = username;
+    }
+    
+    if (description !== undefined) {
+      data.users[userIndex].description = description;
+    }
+    
+    if (req.file) {
+      const oldAvatar = data.users[userIndex].avatar;
+      if (oldAvatar) {
+        const oldAvatarPath = path.join(__dirname, oldAvatar);
+        if (fs.existsSync(oldAvatarPath)) {
+          fs.unlinkSync(oldAvatarPath);
+          console.log('Удален старый аватар:', oldAvatar);
+        }
+      }
+      
+      data.users[userIndex].avatar = `/uploads/avatars/${req.file.filename}`;
+      console.log('Новый аватар сохранен:', data.users[userIndex].avatar);
+      
+      // Проверяем, что файл действительно существует
+      const savedFilePath = path.join(__dirname, 'uploads', 'avatars', req.file.filename);
+      if (fs.existsSync(savedFilePath)) {
+        console.log('Файл успешно сохранен:', savedFilePath);
+      } else {
+        console.error('Файл не найден после сохранения:', savedFilePath);
+      }
+    }
+    
+    saveData();
+    
+    const { password, ...userWithoutPassword } = data.users[userIndex];
+    res.json(userWithoutPassword);
+    
+  } catch (error) {
+    console.error('Ошибка при обновлении профиля:', error);
+    res.status(500).json({ error: 'Внутренняя ошибка сервера' });
   }
-  
-  const { username, description } = req.body;
-  const avatar = req.file ? `/uploads/avatars/${req.file.filename}` : null;
-  
-  // Обновляем данные пользователя
-  if (username) users[userIndex].username = username;
-  if (description) users[userIndex].description = description;
-  if (avatar) users[userIndex].avatar = avatar;
-  
-  res.json({
-    id: users[userIndex].id,
-    username: users[userIndex].username,
-    description: users[userIndex].description,
-    avatar: users[userIndex].avatar
-  });
 });
-// Получение списка всех пользователей (без паролей)
+
+// Получение списка всех пользователей
 app.get('/api/users', (req, res) => {
   if (!req.cookies.jwt) {
     return res.status(401).json({ error: 'Не авторизован' });
   }
   
-  const publicUsers = data.users.map(({ id, username }) => ({ id, username }));
+  const publicUsers = data.users.map(({ id, username, description, avatar }) => ({ 
+    id, 
+    username, 
+    description, 
+    avatar 
+  }));
   res.json(publicUsers);
 });
 
 // Получение сообщений
 app.get('/api/messages', (req, res) => {
-  const limit = parseInt(req.query.limit) || 50;
-  const beforeId = req.query.before ? parseInt(req.query.before) : null;
-  
   if (!req.cookies.jwt) {
     return res.status(401).json({ error: 'Не авторизован' });
   }
+  
+  const limit = parseInt(req.query.limit) || 50;
+  const beforeId = req.query.before ? parseInt(req.query.before) : null;
   
   let sortedMessages = [...data.messages].sort((a, b) => 
     new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -273,7 +362,6 @@ app.get('/api/messages', (req, res) => {
   }
   
   const limitedMessages = sortedMessages.slice(-limit);
-  
   res.json(limitedMessages);
 });
 
@@ -286,7 +374,6 @@ app.delete('/api/messages/:id', (req, res) => {
   }
   
   const userId = parseInt(req.cookies.jwt.split('-').pop() || '0');
-  
   const messageIndex = data.messages.findIndex(m => m.id === id);
   
   if (messageIndex === -1) {
@@ -306,14 +393,13 @@ app.delete('/api/messages/:id', (req, res) => {
 const server = app.listen(PORT, () => {
   console.log(`Сервер запущен на http://localhost:${PORT}`);
   console.log(`WebSocket: ws://localhost:${PORT}/ws`);
-  console.log(`Доступные пользователи: ${data.users.map(u => u.username).join(', ')}`);
+  console.log(`Static files served from: ${path.join(__dirname, 'uploads')}`);
 });
 
 // Создание WebSocket сервера
 const wss = new WebSocketServer({ server, path: '/ws' });
 
 wss.on('connection', (ws, req) => {
-  // Проверка авторизации через cookie
   const cookies = req.headers.cookie;
   if (!cookies || !cookies.includes('jwt')) {
     ws.close(1008, 'Unauthorized');
@@ -356,7 +442,6 @@ wss.on('connection', (ws, req) => {
       data.messages.push(newMessage);
       saveData();
       
-      // Рассылаем сообщение всем подключенным клиентам
       wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify(newMessage));

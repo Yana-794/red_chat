@@ -3,17 +3,30 @@
     {
       "id": 1,
       "username": "Алиса",
-      "password": "123"
+      "password": "123",
+      "description": "",
+      "avatar": null
     },
     {
       "id": 2,
-      "username": "Боб",
-      "password": "123"
+      "username": "Bob",
+      "password": "123",
+      "description": "Я Bob))",
+      "avatar": "/uploads/avatars/avatar-1773678778026-304650522.jpg"
     },
     {
       "id": 3,
-      "username": "test",
-      "password": "test"
+      "username": "Yana",
+      "password": "test",
+      "description": "1",
+      "avatar": "/uploads/avatars/avatar-1773669939534-610717307.jpg"
+    },
+    {
+      "id": 4,
+      "username": "Bobi",
+      "password": "123",
+      "description": "Приветик!!",
+      "avatar": "/uploads/avatars/avatar-1773678916822-324020969.jpg"
     }
   ],
   "messages": [
@@ -44,6 +57,48 @@
       "username": "test",
       "content": "wdwd",
       "createdAt": "2026-03-15T10:53:49.688Z"
+    },
+    {
+      "id": 1773669340167,
+      "senderId": 3,
+      "username": "Yana",
+      "content": "jjj",
+      "createdAt": "2026-03-16T13:55:40.167Z"
+    },
+    {
+      "id": 1773678219919,
+      "senderId": 3,
+      "username": "Yana",
+      "content": "deed",
+      "createdAt": "2026-03-16T16:23:39.919Z"
+    },
+    {
+      "id": 1773678426649,
+      "senderId": 2,
+      "username": "Боб",
+      "content": "efefef",
+      "createdAt": "2026-03-16T16:27:06.649Z"
+    },
+    {
+      "id": 1773678925771,
+      "senderId": 4,
+      "username": "Bobi",
+      "content": "привет всем",
+      "createdAt": "2026-03-16T16:35:25.771Z"
+    },
+    {
+      "id": 1773678929640,
+      "senderId": 4,
+      "username": "Bobi",
+      "content": " я боб",
+      "createdAt": "2026-03-16T16:35:29.640Z"
+    },
+    {
+      "id": 1773678953975,
+      "senderId": 4,
+      "username": "Bobi",
+      "content": "всем хай!!",
+      "createdAt": "2026-03-16T16:35:53.975Z"
     }
   ]
 }
