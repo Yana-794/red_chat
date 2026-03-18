@@ -37,13 +37,11 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) 
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Устанавливаем mounted = true после монтирования на клиенте
   useEffect(() => {
     setMounted(true);
     return () => setMounted(false);
   }, []);
 
-  // Загружаем текущего пользователя при открытии
   useEffect(() => {
     if (isOpen) {
       dispatch(getCurrentUserThunk());
@@ -117,7 +115,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) 
       onClick={onClose}
     >
       <div
-        className="bg-[#1a1f3a] rounded-xl w-full max-w-md p-6 relative z-100"
+        className="bg-[#1a1f3a] rounded-xl w-full md:max-w-md max-w-min p-6  relative z-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Заголовок */}

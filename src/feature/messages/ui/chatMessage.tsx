@@ -208,10 +208,10 @@ const MessageList: React.FC = () => {
                         <Check className="w-3 h-3 text-blue-400" />
                         <button
                           onClick={() => handleDeleteMessage(message.id)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity ml-1 hover:text-red-400"
+                          className="opacity-15 group-hover:opacity-100 transition-opacity ml-1 hover:text-red-400"
                           title="Удалить сообщение"
                         >
-                          <Trash2 className="w-3 h-3" />
+                          <Trash2 className="w-2 h-2 md:w-3 md:h-3" />
                         </button>
                       </div>
                     )}

@@ -16,19 +16,19 @@ const PROFILE_ITEMS: ItemProfile[] = [
     path: "#",
      isModal: true,
   },
-  {
-    key: ENavigationKey.Notifications,
-    label: "Уведомления",
-    icon: Bell,
-    path: "/notifications",
+  // {
+  //   key: ENavigationKey.Notifications,
+  //   label: "Уведомления",
+  //   icon: Bell,
+  //   path: "/notifications",
    
-  },
-  {
-    key: ENavigationKey.Settings,
-    label: "Настройки",
-    icon: Settings,
-    path: "/settings",
-  },
+  // },
+  // {
+  //   key: ENavigationKey.Settings,
+  //   label: "Настройки",
+  //   icon: Settings,
+  //   path: "/settings",
+  // },
 ];
 
 interface Props {

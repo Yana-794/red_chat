@@ -36,8 +36,8 @@ const Header: React.FC<HeaderProps> = ({ title, isChat }) => {
   return (
     <header className="p-4 border-b border-red-900/30 bg-[#0a0e27]/40 backdrop-blur-sm">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-white">
+        <div className="pl-15 md:pl-2">
+          <h1 className=" text-xl font-bold text-white">
             {title || currentChat?.name || "Чат"}
           </h1>
          {isChat && (<p className="text-sm text-gray-400">

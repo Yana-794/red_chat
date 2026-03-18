@@ -7,7 +7,7 @@ const Logo: React.FC = () => {
       <div className="w-8 h-8 md:w-10 md:h-10 bg-linear-to-br from-red-600 to-red-700 rounded-xl flex items-center justify-center shadow-lg shadow-red-900/50">
         <MessageCircle className="w-5 h-5 md:w-6 md:h-6 text-white" />
       </div>
-      <h1 className="text-xl md:text-2xl font-bold bg-linear-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+      <h1 className="text-xl md:text-2xl font-bold bg-linear-to-r from-red-500 to-red-600 bg-clip-text text-transparent transition-all duration-500 group-hover:from-red-400 group-hover:to-red-700 group-hover:tracking-wider">
         RedChat
       </h1>
     </div>
