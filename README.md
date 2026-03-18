@@ -16,7 +16,7 @@
     <tr>
       <td align="center" width="50%">
         <strong> Демонстрация работы чата</strong><br/><br/>
-        <a href="public/видео_1.MOV">
+        <a href="public/видео_1.mp4">
           <img src="https://via.placeholder.com/400x225/1a1a2e/ff0040?text=Chat+Preview+1" 
                alt="Превью видео 1" 
                width="100%" 
@@ -26,7 +26,7 @@
       </td>
       <td align="center" width="50%">
         <strong>⚡ Интерфейс и возможности</strong><br/><br/>
-        <a href="public/видео_2.MOV">
+        <a href="public/видео_2.mp4">
           <img src="https://via.placeholder.com/400x225/1a1a2e/ff0040?text=Chat+Preview+2" 
                alt="Превью видео 2" 
                width="100%" 
