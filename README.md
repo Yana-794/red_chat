@@ -1,3 +1,6 @@
+Вот исправленная версия без картинок и скринов:
+
+```markdown
 #  Red Chat
 
 <div align="center">
@@ -9,38 +12,33 @@
 
 ---
 
-## 📺 Видео-обзор
+##  Видео-обзор
 
 <div align="center">
   <table>
     <tr>
       <td align="center" width="50%">
         <strong> Демонстрация работы чата</strong><br/><br/>
-        <a href="public/видео_1.mp4">
-          <img src="https://via.placeholder.com/400x225/1a1a2e/ff0040?text=Chat+Preview+1" 
-               alt="Превью видео 1" 
-               width="100%" 
-               style="border-radius: 12px; border: 2px solid #ff0040;"
-          />
-        </a>
+        <video width="100%" controls preload="metadata" poster="public/preview1.jpg">
+          <source src="public/видео_1.mp4" type="video/mp4">
+          Ваш браузер не поддерживает видео. 
+          <a href="public/видео_1.mp4">Скачать видео</a>
+        </video>
       </td>
       <td align="center" width="50%">
-        <strong>⚡ Интерфейс и возможности</strong><br/><br/>
-        <a href="public/видео_2.mp4">
-          <img src="https://via.placeholder.com/400x225/1a1a2e/ff0040?text=Chat+Preview+2" 
-               alt="Превью видео 2" 
-               width="100%" 
-               style="border-radius: 12px; border: 2px solid #ff0040;"
-          />
-        </a>
+        <strong> Интерфейс и возможности</strong><br/><br/>
+        <video width="100%" controls preload="metadata" poster="public/preview2.jpg">
+          <source src="public/видео_2.mp4" type="video/mp4">
+          Ваш браузер не поддерживает видео.
+          <a href="public/видео_2.mp4">Скачать видео</a>
+        </video>
       </td>
     </tr>
   </table>
 </div>
-
 ---
 
-## ✨ Фичи
+##  Фичи
 
 <div align="center">
   
@@ -84,7 +82,10 @@ npm run dev:all
 
 </div>
 
+---
 
 ##  Цель проекта
 
 Создать атмосферный чат с уникальным кровавым стилем, где каждое сообщение — как капля крови. Никакой истории, только живое общение здесь и сейчас.
+```
+
