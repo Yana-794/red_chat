@@ -10,7 +10,7 @@
 
 ---
 
-##  Видео-обзор
+##  Обзор
 
 <div align="center">
   <table>
@@ -55,8 +55,7 @@
 
 ```bash
 # Клонируем репозиторий
-git clone <your-repo>
-cd red-chat
+git clone 
 
 # Устанавливаем зависимости
 npm install
