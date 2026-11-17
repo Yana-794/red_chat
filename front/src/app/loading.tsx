@@ -1,0 +1,1 @@
+export default function Loading(){return <div className="grid min-h-screen place-items-center bg-[#090d1d] text-slate-400">Загрузка RedChat...</div>}
